@@ -1,0 +1,56 @@
+.image-box {
+    width: 170px;
+    min-height: 180px;
+    border: 2px dashed gray;
+    margin: 10px;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+}
+
+.image-box img {
+    grid-column: span 3;
+    width: 100%;
+}
+
+.answer {
+    padding: 5px;
+    font-size: 13px;
+    text-align: center;
+    border: 2px solid black;
+    background: white;
+    cursor: grab;
+    user-select: none;
+    touch-action: none;
+}
+
+.answer.correct {
+    border-color: green;
+}
+
+.answer.wrong {
+    border-color: red;
+}
+
+.dragging {
+    opacity: 0.5;
+}
+
+/* mobile drag mượt */
+.answer.dragging {
+    position: absolute;
+    z-index: 1000;
+    pointer-events: none;
+}/* ✅ BOX đúng */
+.image-box.correct-box {
+    border: 3px solid #28a745;
+    background-color: #e6f9ed;
+}
+
+/* ❌ BOX sai */
+.image-box.wrong-box {
+    border: 3px solid #dc3545;
+    background-color: #fdeaea;
+}
+
