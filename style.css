@@ -54,3 +54,6 @@
     background-color: #fdeaea;
 }
 
+.answer.selected {
+  outline: 3px solid blue;
+}

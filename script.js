@@ -260,3 +260,45 @@ document.getElementById("checkBtn").onclick = () => {
     let modal = new bootstrap.Modal(document.getElementById("resultModal"));
     modal.show();
 };
+
+
+let selectedAnswer = null;
+item.addEventListener("click", function () {
+  document.querySelectorAll(".answer").forEach(a => a.classList.remove("selected"));
+
+  this.classList.add("selected");
+
+  if (this.classList.contains("source")) {
+    selectedAnswer = this.cloneNode(true);
+    selectedAnswer.classList.remove("source");
+    addDragEvents(selectedAnswer);
+  } else {
+    selectedAnswer = this;
+  }
+});
+
+box.addEventListener("click", function () {
+  if (!selectedAnswer) return;
+
+  let item;
+
+  // nếu là item clone từ bank
+  if (selectedAnswer.classList.contains("answer") && selectedAnswer.parentElement === null) {
+    item = selectedAnswer;
+  } else {
+    // nếu là item đã nằm trong box khác → clone lại để tránh di chuyển
+    item = selectedAnswer.cloneNode(true);
+  }
+
+  this.appendChild(item);
+
+  item.style.position = "relative";
+  item.style.left = "0";
+  item.style.top = "0";
+
+  addDragEvents(item);
+
+  selectedAnswer = null;
+
+  checkEnableButton();
+});
