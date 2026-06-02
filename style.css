@@ -56,4 +56,5 @@
 
 .answer.selected {
   outline: 3px solid blue;
+  background: #e7f1ff;
 }

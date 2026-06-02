@@ -13,6 +13,7 @@ const correctAnswers = {
 
 let dragged = null;
 let touchItem = null;
+let selectedAnswer = null;
 
 /* ======================
    ✅ GẮN DRAG EVENT
@@ -27,18 +28,15 @@ function addDragEvents(el) {
     // ✅ QUAN TRỌNG: KÉO RA NGOÀI → XOÁ (PC)
     el.addEventListener("dragend", function (e) {
 
-        // lấy vị trí chuột
         const x = e.clientX;
         const y = e.clientY;
 
         let target = document.elementFromPoint(x, y);
 
-        // tìm xem có nằm trong image-box không
         while (target && !target.classList.contains("image-box")) {
             target = target.parentElement;
         }
 
-        // ❗ nếu KHÔNG nằm trong box → xoá
         if (!target) {
             if (!el.classList.contains("source")) {
                 el.remove();
@@ -47,6 +45,7 @@ function addDragEvents(el) {
 
         checkEnableButton();
     });
+
     // MOBILE
     el.addEventListener("touchstart", function () {
 
@@ -98,6 +97,24 @@ document.querySelectorAll('.answer').forEach(item => {
         touchItem.classList.add("dragging");
     });
 
+    // ✅ TAP-TAP SELECT
+    item.addEventListener("click", function () {
+
+        if (this.classList.contains("dragging")) return;
+
+        document.querySelectorAll(".answer").forEach(a => a.classList.remove("selected"));
+
+        this.classList.add("selected");
+
+        if (this.classList.contains("source")) {
+            selectedAnswer = this.cloneNode(true);
+            selectedAnswer.classList.remove("source");
+            addDragEvents(selectedAnswer);
+        } else {
+            selectedAnswer = this;
+        }
+    });
+
 });
 
 /* ======================
@@ -111,12 +128,38 @@ document.querySelectorAll(".image-box").forEach(box => {
 
         this.appendChild(dragged);
 
-        // reset style
         dragged.style.position = "relative";
         dragged.style.left = "0";
         dragged.style.top = "0";
 
         addDragEvents(dragged);
+
+        checkEnableButton();
+    });
+
+    // ✅ TAP-TAP DROP
+    box.addEventListener("click", function () {
+
+        if (!selectedAnswer) return;
+
+        let item;
+
+        if (!selectedAnswer.parentElement) {
+            item = selectedAnswer;
+        } else {
+            item = selectedAnswer.cloneNode(true);
+        }
+
+        this.appendChild(item);
+
+        item.style.position = "relative";
+        item.style.left = "0";
+        item.style.top = "0";
+
+        addDragEvents(item);
+
+        document.querySelectorAll(".answer").forEach(a => a.classList.remove("selected"));
+        selectedAnswer = null;
 
         checkEnableButton();
     });
@@ -154,7 +197,6 @@ document.addEventListener("touchend", function (e) {
 
         target.appendChild(touchItem);
 
-        // snap lại grid
         touchItem.style.position = "relative";
         touchItem.style.left = "0";
         touchItem.style.top = "0";
@@ -163,7 +205,6 @@ document.addEventListener("touchend", function (e) {
 
     } else {
 
-        // ✅ THẢ NGOÀI → XOÁ
         if (!touchItem.classList.contains("source")) {
             touchItem.remove();
         }
@@ -207,14 +248,12 @@ document.getElementById("checkBtn").onclick = () => {
         const correctType = correctAnswers[box.dataset.name];
         const answers = box.querySelectorAll(".answer");
 
-        // reset trạng thái box
         box.classList.remove("correct-box", "wrong-box");
 
         const correctList = Array.isArray(correctType) ? correctType : [correctType];
 
         let boxCorrect = true;
 
-        // ❗ phải đủ số lượng
         if (answers.length !== correctList.length) {
             boxCorrect = false;
         }
@@ -236,7 +275,6 @@ document.getElementById("checkBtn").onclick = () => {
             }
         });
 
-        // ❗ kiểm tra thiếu đáp án
         const droppedTypes = Array.from(answers).map(a => a.dataset.type);
 
         const missing = correctList.some(type => !droppedTypes.includes(type));
@@ -244,12 +282,11 @@ document.getElementById("checkBtn").onclick = () => {
             boxCorrect = false;
         }
 
-        // ✅ tô màu khung
         if (boxCorrect) {
-            box.classList.add("correct-box");   // xanh
+            box.classList.add("correct-box");
             correctCount++;
         } else {
-            box.classList.add("wrong-box");     // đỏ
+            box.classList.add("wrong-box");
         }
 
     });
@@ -260,45 +297,3 @@ document.getElementById("checkBtn").onclick = () => {
     let modal = new bootstrap.Modal(document.getElementById("resultModal"));
     modal.show();
 };
-
-
-let selectedAnswer = null;
-item.addEventListener("click", function () {
-  document.querySelectorAll(".answer").forEach(a => a.classList.remove("selected"));
-
-  this.classList.add("selected");
-
-  if (this.classList.contains("source")) {
-    selectedAnswer = this.cloneNode(true);
-    selectedAnswer.classList.remove("source");
-    addDragEvents(selectedAnswer);
-  } else {
-    selectedAnswer = this;
-  }
-});
-
-box.addEventListener("click", function () {
-  if (!selectedAnswer) return;
-
-  let item;
-
-  // nếu là item clone từ bank
-  if (selectedAnswer.classList.contains("answer") && selectedAnswer.parentElement === null) {
-    item = selectedAnswer;
-  } else {
-    // nếu là item đã nằm trong box khác → clone lại để tránh di chuyển
-    item = selectedAnswer.cloneNode(true);
-  }
-
-  this.appendChild(item);
-
-  item.style.position = "relative";
-  item.style.left = "0";
-  item.style.top = "0";
-
-  addDragEvents(item);
-
-  selectedAnswer = null;
-
-  checkEnableButton();
-});
