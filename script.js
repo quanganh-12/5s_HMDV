@@ -234,6 +234,13 @@ function checkEnableButton() {
 }
 
 /* ======================
+   ✅ RESET
+====================== */
+document.getElementById("resetBtn").onclick = () => {
+    location.reload();
+};
+
+/* ======================
    ✅ CHECK RESULT
 ====================== */
 document.getElementById("checkBtn").onclick = () => {
